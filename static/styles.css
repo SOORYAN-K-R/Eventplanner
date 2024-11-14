@@ -1,0 +1,113 @@
+body {
+    background:#E0F7FA;/* Gradient background */
+    font-family: 'Arial', sans-serif;
+    background-attachment: fixed; /* Keep background fixed */
+    background-size: cover; /* Ensure background covers entire viewport */
+}
+
+header {
+    margin-bottom: 20px;
+}
+
+.navbar {
+    
+    background-color: #6a1b9a; /* Rich purple */
+    
+    color: #d81b60;
+    
+}
+
+.navbar-brand {
+    color: #ffffff !important; /* White text for brand */
+    font-weight: bold;
+    font-size: 24px; /* Increased brand size */
+}
+
+.card {
+    border: none;
+    border-radius: 20px; /* Rounded corners */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.9); /* Slight transparency */
+    padding: 40px; /* Increased padding */
+}
+
+.card-title {
+    font-size: 36px; /* Slightly larger title */
+    font-weight: bold;
+    color: #6a1b9a; /* Rich purple for title */
+    margin-bottom: 20px; /* Space below title */
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #6a1b9a; /* Rich purple for labels */
+}
+
+input[type="text"],
+input[type="password"] {
+    border-radius: 10px; /* Rounded input fields */
+    border: 2px solid #e1bee7; /* Soft purple border */
+    padding: 12px; /* Increased padding */
+    width: 100%;
+    box-sizing: border-box; /* Include padding in width */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Added box-shadow transition */
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #6a1b9a; /* Rich purple on focus */
+    outline: none; /* Remove outline */
+    box-shadow: 0 0 8px rgba(106, 27, 154, 0.5); /* Glow effect */
+}
+
+.btn-primary {
+    background-color: #ff4081; /* Pinkish color */
+    border: none;
+    border-radius: 25px; /* Rounded button */
+    padding: 14px 28px; /* Increased padding */
+    font-size: 18px; /* Increased font size */
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #f50057; /* Darker pink on hover */
+    transform: translateY(-2px);
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #6a1b9a; /* Rich purple footer */
+    color: white;
+    text-align: center;
+    padding: 15px 0; /* Added padding */
+   
+}
+
+.text-center p {
+    margin: 0;
+}
+
+.text-center a {
+    color: #ff4081; /* Pink for links */
+    text-decoration: none;
+    transition: color 0.3s; /* Added transition for link color */
+}
+
+.text-center a:hover {
+    color: #d81b60; /* Darker pink on hover */
+    text-decoration: underline;
+}
+
+/* Added media query for responsiveness */
+@media (max-width: 768px) {
+    .card {
+        padding: 20px; /* Reduced padding for smaller screens */
+    }
+
+    .card-title {
+        font-size: 28px; /* Adjust title size for smaller screens */
+    }
+}
