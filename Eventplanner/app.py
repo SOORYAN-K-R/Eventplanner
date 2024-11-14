@@ -13,6 +13,7 @@ app.secret_key = 'your_secret_key'
 
 
 
+app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
 
 # DB configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///events.db'
