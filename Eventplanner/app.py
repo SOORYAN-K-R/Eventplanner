@@ -145,11 +145,11 @@ def load_user(user_id):
 oauth = OAuth(app)
 facebook = oauth.register(
     name='facebook',
-    client_id='your_facebook_client_id',
-    client_secret='your_facebook_client_secret',
+    client_id='425656537070861',
+    client_secret='d6bc5641a5e7c5184aa594524c179cf6',
     authorize_url='https://www.facebook.com/dialog/oauth',
     access_token_url='https://graph.facebook.com/oauth/access_token',
-    redirect_uri='https://your_ngrok_url/login/facebook/authorized',
+    redirect_uri='https://eventplanner-nctc.onrender.com/login/facebook/authorized',
     client_kwargs={'scope': 'email'}
 )
 
