@@ -284,7 +284,18 @@ def callback():
     return redirect("/protected_area")
 
 
-
+@app.route("/protected_area")
+@login_is_required
+def protected_area():
+    # Check if the user is authenticated with Google or through regular login
+    if "google_id" in session:
+        # Display the Google user's name
+        return f"Hello Google User {session['name']}! <br/><a href='/logout'><button>Logout</button></a>"
+    elif current_user.is_authenticated:
+        # Display the regular logged-in user's name
+        return f"Hello {current_user.username}! <br/><a href='/logout'><button>Logout</button></a>"
+    else:
+        return redirect(url_for("login"))
 
 
 
