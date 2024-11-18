@@ -292,8 +292,11 @@ def protected_area():
         # Display the Google user's name
         return f"Hello Google User {session['name']}! <br/><a href='/logout'><button>Logout</button></a>"
     elif current_user.is_authenticated:
-        # Display the regular logged-in user's name
-        return f"Hello {current_user.username}! <br/><a href='/logout'><button>Logout</button></a>"
+        return redirect(url_for("login"))
+        """
+         # Display the regular logged-in user's name
+        return f"Hello {current_user.username}! <br/><a href='/logout'><button>Logout</button></a>" 
+        """
     else:
         return redirect(url_for("login"))
 
