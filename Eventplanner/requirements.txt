@@ -6,3 +6,5 @@ Werkzeug==2.3.7
 Flask-Migrate==4.0.4
 Authlib==1.2.1
 requests==2.31.0
+google-auth==2.36.0
+google-auth-oauthlib==1.2.1
