@@ -20,8 +20,8 @@
         .btn-custom {
             background-color: #625fc8;
             border: none;
-            width: 100px;
-            margin-left: 170px;
+            width: 100%;
+            margin-top: 10px;
         }
         .btn-custom:hover {
             background-color: #3030a9;
@@ -29,11 +29,23 @@
         .btn-facebook {
             background-color: #4267B2;
             color: white;
-            width: 100%;
-            margin-top: 10px;
         }
         .btn-facebook:hover {
             background-color: #365899;
+        }
+        .btn-google {
+            background-color: #DB4437;
+            color: white;
+        }
+        .btn-google:hover {
+            background-color: #C23321;
+        }
+        .btn-github {
+            background-color: #333333;
+            color: white;
+        }
+        .btn-github:hover {
+            background-color: #24292F;
         }
         .text-white a {
             color: #00BCD4;
@@ -47,6 +59,7 @@
 
     <div class="container">
         <h2 class="text-center">Login</h2>
+        <!-- Traditional Login Form -->
         <form method="POST" action="{{ url_for('login') }}">
             <div class="form-group">
                 <label for="email">Email:</label>
@@ -56,15 +69,75 @@
                 <label for="password">Password:</label>
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
-            <button type="submit" class="btn btn-custom btn-block">Login</button>
+            <button type="submit" class="btn btn-custom">Login</button>
         </form>
 
-        <!-- Add Login with Facebook Button -->
+        <!-- OAuth Login Buttons -->
         <form action="{{ url_for('login_facebook') }}" method="GET">
-            <button type="submit" class="btn btn-facebook">
-                <i class="fab fa-facebook-f"></i> Login with Facebook
-            </button>
-        </form>
+            <!--FACEBOOK SIGN IN -->
+<script>
+    window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '425656537070861',
+      cookie     : true,  // enable cookies to allow the server to access
+                          // the session
+      xfbml      : true,  // parse social plugins on this page
+      version    : 'v2.2' // use version 2.2
+    });
+    };
+    // Load the SDK asynchronously
+    (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+    // Here we run a very simple test of the Graph API after login is
+    // successful.  See statusChangeCallback() for when this call is made.
+    function sendTokenToServer() {
+      var access_token = FB.getAuthResponse()['accessToken'];
+      console.log(access_token)
+      console.log('Welcome!  Fetching your information.... ');
+      FB.api('/me', function(response) {
+        console.log('Successful login for: ' + response.name);
+       $.ajax({
+        type: 'POST',
+        url: '/fbconnect?state={{STATE}}',
+        processData: false,
+        data: access_token,
+        contentType: 'application/octet-stream; charset=utf-8',
+        success: function(result) {
+          // Handle or verify the server response if necessary.
+          if (result) {
+            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+           setTimeout(function() {
+            window.location.href = "/restaurant";
+           }, 4000);
+  
+        } else {
+          $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+           }
+        }
+  
+    });
+      });
+    }
+  </script>
+  
+  
+  <button>
+  
+  
+            <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
+  <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
+  
+  </fb:login-button>
+  
+  
+          </button>
+  <!--END FACEBOOK SIGN IN -->
+
 
         <p class="text-center mt-3">Don't have an account? <a href="{{ url_for('register') }}" class="text-white">Register here</a></p>
     </div>

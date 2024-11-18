@@ -10,6 +10,13 @@ import os
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
+from flask import g
+from flask_login import current_user
+
+@app.context_processor
+def inject_user():
+    return dict(current_user=current_user)
+
 # DB configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///events.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -113,6 +120,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
+
 # Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -132,40 +140,81 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-# Initialize Login Manager
-login_manager = LoginManager()
-login_manager.login_view = 'login'
-login_manager.init_app(app)
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-# Facebook OAuth Configuration
-oauth = OAuth(app)
-facebook = oauth.register(
-    name='facebook',
-    client_id='425656537070861',
-    client_secret='d6bc5641a5e7c5184aa594524c179cf6',
-    authorize_url='https://www.facebook.com/dialog/oauth',
-    access_token_url='https://graph.facebook.com/oauth/access_token',
-    redirect_uri='https://eventplanner-nctc.onrender.com/login/facebook/authorized',
-    client_kwargs={'scope': 'email'}
-)
-
-# Facebook Login
-@app.route('/login/facebook')
+@app.route('/login_facebook', methods=['POST'])
 def login_facebook():
-    redirect_uri = url_for('facebook_authorized', _external=True)
-    return facebook.authorize_redirect(redirect_uri)
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    access_token = request.data
+    print ("access token received %s " % access_token)
 
-@app.route('/login/facebook/authorized')
-def facebook_authorized():
-    token = facebook.authorize_access_token()
-    resp = facebook.get('https://graph.facebook.com/me?fields=id,name,email')
-    profile = resp.json()
-    session['user'] = profile
-    return redirect(url_for('home'))
+    app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
+        'web']['app_id']
+    app_secret = json.loads(
+        open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+        app_id, app_secret, access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+
+    # Use token to get user info from API
+    userinfo_url = "https://graph.facebook.com/v2.4/me"
+    # strip expire tag from access token
+    token = result.split("&")[0]
+
+
+    url = 'https://graph.facebook.com/v2.4/me?%s&fields=name,id,email' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    # print "url sent for API access:%s"% url
+    # print "API JSON result: %s" % result
+    data = json.loads(result)
+    login_session['provider'] = 'facebook'
+    login_session['username'] = data["name"]
+    login_session['email'] = data["email"]
+    login_session['facebook_id'] = data["id"]
+
+    # The token must be stored in the login_session in order to properly logout, let's strip out the information before the equals sign in our token
+    stored_token = token.split("=")[1]
+    login_session['access_token'] = stored_token
+
+    # Get user picture
+    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    data = json.loads(result)
+
+    login_session['picture'] = data["data"]["url"]
+
+    # see if user exists
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+
+    flash("Now logged in as %s" % login_session['username'])
+    return output
+
+
+@app.route('/fbdisconnect')
+def fbdisconnect():
+    facebook_id = login_session['facebook_id']
+    # The access token must me included to successfully logout
+    access_token = login_session['access_token']
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'DELETE')[1]
+    return "you have been logged out"
 
 # Run the app
 if __name__ == '__main__':
